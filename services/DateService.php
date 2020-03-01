@@ -91,12 +91,14 @@ class DateService
     public function getSalaryDate()
     {
         $salaryDate = null;
-        $day = $this->getLastDayOfMonth($this->month, $this->year);
+        $month = $this->month;
+        $year = $this->year;
+        $salaryDay = $this->getLastDayOfMonth($month, $year);
         while ($salaryDate === null) {
-            if ($this->isWeekend($day, $this->month, $this->year)) {
-                $this->day--;
+            if ($this->isWeekend($salaryDay, $month, $year)) {
+                $salaryDay--;
             } else {
-                $salaryDate = $this->getFormattedDate($day, $this->month, $this->year);
+                $salaryDate = $this->getFormattedDate($salaryDay, $month, $year);
             }
         }
         return $salaryDate;
@@ -104,14 +106,15 @@ class DateService
 
     public function getBonusDate()
     {
-        $bonusDate = null;
         $bonusDay = self::BONUS_DAY;
-        if ($this->isWeekend($bonusDay, $this->month+1, $this->year)) {
-            $dayOfWeek = $this->getDayOfWeek($bonusDay, $this->month+1, $this->year);
+        $month = $this->month < self::TOTAL_MONTH ? $this->month + 1 : 1;
+        $year = $this->month < self::TOTAL_MONTH ? $this->year : $this->year + 1;
+        if ($this->isWeekend($bonusDay, $month, $year)) {
+            $dayOfWeek = $this->getDayOfWeek($bonusDay, $month, $year);
             $offset = self::TOTAL_WEEK_DAYS - $dayOfWeek + self::NEEDED_DAY;
             $bonusDay = $bonusDay + $offset;
         }
-        $bonusDate = $this->getFormattedDate($bonusDay, $this->month+1, $this->year);
+        $bonusDate = $this->getFormattedDate($bonusDay, $month, $year);
         return $bonusDate;
     }
 

@@ -22,7 +22,7 @@ class DateService
     protected const BONUS_DAY = 15;
     protected const NEEDED_DAY = 3;
     protected const TOTAL_WEEK_DAYS = 7;
-    protected const DATA_HEADER = [['Month', 'Salary Date', 'Bonus Date']];
+    protected const DATA_HEADER = ['Month', 'Salary Date', 'Bonus Date'];
 
     public function getDateFormat()
     {
@@ -127,7 +127,7 @@ class DateService
     public function getData()
     {
         $this->init();
-        $data = self::DATA_HEADER;
+        $data = [self::DATA_HEADER];
         while ($this->month <= self::TOTAL_MONTH) {
             $data[] = [$this->getMonthName($this->day, $this->month, $this->year), $this->getSalaryDate(), $this->getBonusDate()];
             $this->month++;

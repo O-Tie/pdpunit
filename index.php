@@ -8,5 +8,3 @@ use helpers\FileManager;
 
 $data = (new DateService())->getData();
 FileManager::exportCsv($data);
-
-?>

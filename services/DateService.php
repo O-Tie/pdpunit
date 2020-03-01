@@ -1,5 +1,4 @@
 <?php
-
 namespace services;
 
 /**
@@ -9,92 +8,122 @@ namespace services;
 class DateService
 {
     protected $currentDay;
-    protected $currentDayArray;
-    protected $day;
     protected $month;
     protected $year;
     protected const TOTAL_MONTH = 12;
     protected const WEEKEND_DAYS = [6, 7];
-    protected const DATE_DAY = 0;
-    protected const DATE_MONTH = 1;
-    protected const DATE_YEAR = 2;
     protected const DATE_DELIMETER = '-';
+    protected const FIRST_DAY_OF_MONTH = 1;
     protected const BONUS_DAY = 15;
     protected const NEEDED_DAY = 3;
     protected const TOTAL_WEEK_DAYS = 7;
     protected const DATA_HEADER = ['Month', 'Salary Date', 'Bonus Date'];
 
-    public function getDateFormat()
+    /**
+     * @return string
+     */
+    public function getDateFormat(): string
     {
-        return 'd' . self::DATE_DELIMETER  . 'm'  . self::DATE_DELIMETER . 'Y';
+        return 'd-m-Y';
     }
 
     public function setCurrentDay()
     {
-        $this->currentDay = date($this->getDateFormat(), time());
-    }
-
-    protected function setCurrentDayArray()
-    {
-        $this->currentDayArray = explode(self::DATE_DELIMETER, $this->currentDay);
-    }
-
-    protected function setDay()
-    {
-        $this->day = $this->currentDayArray[self::DATE_DAY];
+        $this->currentDay = time();
     }
 
     protected function setMonth()
     {
-        $this->month = $this->currentDayArray[self::DATE_MONTH];
+        $this->month = date('n', $this->currentDay);
     }
 
     protected function setYear()
     {
-        $this->year = $this->currentDayArray[self::DATE_YEAR];
+        $this->year = date('Y', $this->currentDay);
     }
 
-    protected function getLastDayOfMonth($month, $year)
+    /**
+     * @param $month
+     * @param $year
+     * @return string
+     */
+    protected function getLastDayOfMonth($month, $year): string
     {
-        return date('t', mktime(0,0,0, (int) $month,1, (int) $year));
+        return date('t', mktime(0, 0, 0, $month, 1, $year));
     }
 
-    protected function getDate($day, $month, $year)
+    /**
+     * @param $day
+     * @param $month
+     * @param $year
+     * @return string
+     */
+    protected function getDate($day, $month, $year): string
     {
         return $day . self::DATE_DELIMETER . $month . self::DATE_DELIMETER . $year;
     }
 
-    protected function getFormattedDate($day, $month, $year)
+    /**
+     * @param $day
+     * @param $month
+     * @param $year
+     * @return string
+     */
+    protected function getFormattedDate($day, $month, $year): string
     {
         return date($this->getDateFormat(), strtotime($this->getDate($day, $month, $year)));
     }
 
-    protected function getDayOfWeek($day, $month, $year)
+    /**
+     * @param $day
+     * @param $month
+     * @param $year
+     * @return string
+     */
+    protected function getDayOfWeek($day, $month, $year): string
     {
         return date('N', strtotime($this->getDate($day, $month, $year)));
     }
 
-    protected function isWeekend($day, $month, $year)
+    /**
+     * @param $day
+     * @param $month
+     * @param $year
+     * @return bool
+     */
+    protected function isWeekend($day, $month, $year): bool
     {
         $dayOfWeek = $this->getDayOfWeek($day, $month, $year);
         return in_array($dayOfWeek, self::WEEKEND_DAYS);
     }
 
-    protected function getMonthName($day, $month, $year)
+    /**
+     * Returns month name, example 'June'
+     * @param $day
+     * @param $month
+     * @param $year
+     * @return string
+     */
+    protected function getMonthName($day, $month, $year): string
     {
         return date('F', strtotime($this->getDate($day, $month, $year)));
     }
 
-    public function init()
+    /**
+     * Initialize application data
+     */
+    protected function init()
     {
         $this->setCurrentDay();
-        $this->setCurrentDayArray();
-        $this->setDay();
         $this->setMonth();
         $this->setYear();
     }
 
-    public function getSalaryDate()
+    /**
+     * Returns formatted salary date
+     * @return string|null
+     */
+    protected function getSalaryDate(): ?string
     {
         $salaryDate = null;
         $month = $this->month;
@@ -110,26 +139,34 @@ class DateService
         return $salaryDate;
     }
 
-    public function getBonusDate()
+    /**
+     * Returns formatted bonus date
+     * @return string
+     */
+    protected function getBonusDate(): string
     {
         $bonusDay = self::BONUS_DAY;
-        $month = $this->month < self::TOTAL_MONTH ? $this->month + 1 : 1;
-        $year = $this->month < self::TOTAL_MONTH ? $this->year : $this->year + 1;
+        $month = $this->month < self::TOTAL_MONTH ? $this->month + 1 : 1; /*get the number of month for paying bonus*/
+        $year = $this->month < self::TOTAL_MONTH ? $this->year : $this->year + 1; /*get the year for paying bonus*/
         if ($this->isWeekend($bonusDay, $month, $year)) {
             $dayOfWeek = $this->getDayOfWeek($bonusDay, $month, $year);
             $offset = self::TOTAL_WEEK_DAYS - $dayOfWeek + self::NEEDED_DAY;
-            $bonusDay = $bonusDay + $offset;
+            $bonusDay = $bonusDay + $offset; /*get wednesday*/
         }
         $bonusDate = $this->getFormattedDate($bonusDay, $month, $year);
         return $bonusDate;
     }
 
-    public function getData()
+    /**
+     * Returns prepared data for export to CSV
+     * @return array
+     */
+    public function getData(): array
     {
         $this->init();
         $data = [self::DATA_HEADER];
         while ($this->month <= self::TOTAL_MONTH) {
-            $data[] = [$this->getMonthName($this->day, $this->month, $this->year), $this->getSalaryDate(), $this->getBonusDate()];
+            $data[] = [$this->getMonthName(self::FIRST_DAY_OF_MONTH, $this->month, $this->year), $this->getSalaryDate(), $this->getBonusDate()];
             $this->month++;
         }
         return $data;

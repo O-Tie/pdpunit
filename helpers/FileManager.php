@@ -7,15 +7,19 @@ namespace helpers;
  */
 class FileManager
 {
-
-    public static function exportCsv($data)
+    /**
+     * @param array $data
+     */
+    public static function exportCsv(array $data)
     {
-        $fp = fopen('file.csv', 'w');
-
-        foreach ($data as $fields) {
-            fputcsv($fp, $fields);
+        try {
+            $fp = fopen('file.csv', 'w');
+            foreach ($data as $fields) {
+                fputcsv($fp, $fields);
+            }
+            fclose($fp);
+        } catch (\Exception $e) {
+            error_log('message: ' . $e->getMessage());
         }
-
-        fclose($fp);
     }
 }

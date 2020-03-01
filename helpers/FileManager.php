@@ -1,5 +1,5 @@
 <?php
-namespace helpers\FileManager;
+namespace helpers;
 
 /**
  * Class FileManager
@@ -7,17 +7,12 @@ namespace helpers\FileManager;
  */
 class FileManager
 {
-    public static function createCsv($list = null)
-    {
-        $list = array (
-            array('Month', 'Salary Date', 'Bonus Date'),
-            array('123', '456', '789'),
-            array('"aaa"', '"bbb"')
-        );
 
+    public static function exportCsv($data)
+    {
         $fp = fopen('file.csv', 'w');
 
-        foreach ($list as $fields) {
+        foreach ($data as $fields) {
             fputcsv($fp, $fields);
         }
 

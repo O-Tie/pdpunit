@@ -3,7 +3,10 @@
 require_once 'helpers/FileManager.php';
 require_once 'services/DateService.php';
 
-$dates = (new \services\FileService\DateService())->getSalaryDates();
+use services\DateService;
+use helpers\FileManager;
 
-$a = $dates;
+$data = (new DateService())->getData();
+FileManager::exportCsv($data);
+
 ?>

@@ -1,10 +1,10 @@
 <?php
 
-namespace services\FileService;
+namespace services;
 
 /**
  * Class FileService
- * @package services\FileService
+ * @package services\DateService
  */
 class DateService
 {
@@ -22,6 +22,7 @@ class DateService
     protected const BONUS_DAY = 15;
     protected const NEEDED_DAY = 3;
     protected const TOTAL_WEEK_DAYS = 7;
+    protected const DATA_HEADER = [['Month', 'Salary Date', 'Bonus Date']];
 
     public function getDateFormat()
     {
@@ -79,6 +80,11 @@ class DateService
         return in_array($dayOfWeek, self::WEEKEND_DAYS);
     }
 
+    protected function getMonthName($day, $month, $year)
+    {
+        return date('F', strtotime($this->getDate($day, $month, $year)));
+    }
+
     public function init()
     {
         $this->setCurrentDay();
@@ -118,14 +124,14 @@ class DateService
         return $bonusDate;
     }
 
-    public function getSalaryDates()
+    public function getData()
     {
         $this->init();
-        $dates = [];
+        $data = self::DATA_HEADER;
         while ($this->month <= self::TOTAL_MONTH) {
-            $dates[] = [$this->getSalaryDate(), $this->getBonusDate()];
+            $data[] = [$this->getMonthName($this->day, $this->month, $this->year), $this->getSalaryDate(), $this->getBonusDate()];
             $this->month++;
         }
-        return $dates;
+        return $data;
     }
 }

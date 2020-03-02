@@ -22,12 +22,12 @@ class DateService
     /**
      * @return string
      */
-    public function getDateFormat(): string
+    protected function getDateFormat(): string
     {
         return 'd-m-Y';
     }
 
-    public function setCurrentDay()
+    protected function setCurrentDay()
     {
         $this->currentDay = time();
     }
